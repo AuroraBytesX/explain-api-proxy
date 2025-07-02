@@ -43,6 +43,7 @@ app.post("/explain", async (req, res) => {
     });
 
     const data = await response.json();
+    console.log("✅ Loaded API Key:", process.env.API_KEY);
 
     // ✅ Add this log to see the full response
     console.log("✅ OpenRouter API FULL Response:", JSON.stringify(data, null, 2));
