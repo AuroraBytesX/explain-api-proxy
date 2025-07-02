@@ -26,7 +26,7 @@ app.post("/explain", async (req, res) => {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${process.env.API_KEY}`,
-        "HTTP-Referer": "https://bolt.new", // Update this to your deployed frontend if needed
+        "HTTP-Referer": "https://bolt.new", // You can update this later to your deployed frontend
         "X-Title": "Explain Like I'm Root"
       },
       body: JSON.stringify({
@@ -43,6 +43,9 @@ app.post("/explain", async (req, res) => {
     });
 
     const data = await response.json();
+
+    // ✅ Add this log to see the full response
+    console.log("✅ OpenRouter API FULL Response:", JSON.stringify(data, null, 2));
 
     res.json({
       choices: [
