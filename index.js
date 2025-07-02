@@ -38,7 +38,7 @@ app.post("/explain", async (req, res) => {
           }
         ],
         temperature: 0.85,
-        max_tokens: 300
+        max_tokens: 100
       })
     });
 
