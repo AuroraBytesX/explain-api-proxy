@@ -1,17 +1,3 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-const API_KEY = process.env.OPENROUTER_API_KEY;
-
 app.post("/explain", async (req, res) => {
   const { prompt } = req.body;
 
@@ -20,8 +6,8 @@ app.post("/explain", async (req, res) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${API_KEY}`,
-        "HTTP-Referer": "https://yourfrontend.com",
+        "Authorization": `Bearer ${process.env.API_KEY}`,
+        "HTTP-Referer": "https://bolt.new",  // ✅ Use your actual frontend URL if deployed
         "X-Title": "Explain Like I'm Root"
       },
       body: JSON.stringify({
@@ -33,13 +19,21 @@ app.post("/explain", async (req, res) => {
     });
 
     const data = await response.json();
-    res.json(data);
+
+    // ✅ Return only the part your frontend expects
+    res.json({
+      choices: [
+        {
+          message: {
+            content: data.choices?.[0]?.message?.content || "🤯 No explanation received."
+          }
+        }
+      ]
+    });
+
   } catch (err) {
-    console.error("Error:", err);
+    console.error("🚨 Backend error:", err);
     res.status(500).json({ error: "Something went wrong." });
   }
 });
 
-app.listen(3000, () => {
-  console.log("✅ API proxy server running on port 3000");
-});
