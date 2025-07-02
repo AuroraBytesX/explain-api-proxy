@@ -1,5 +1,24 @@
+// index.js
+
+const express = require("express");
+const cors = require("cors");
+const fetch = require("node-fetch");
+require("dotenv").config(); // Load .env variables
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// POST route to handle explanation request
 app.post("/explain", async (req, res) => {
   const { prompt } = req.body;
+
+  if (!prompt) {
+    return res.status(400).json({ error: "No prompt provided." });
+  }
 
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -7,12 +26,17 @@ app.post("/explain", async (req, res) => {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${process.env.API_KEY}`,
-        "HTTP-Referer": "https://bolt.new",  // ✅ Use your actual frontend URL if deployed
+        "HTTP-Referer": "https://bolt.new", // Update this to your deployed frontend if needed
         "X-Title": "Explain Like I'm Root"
       },
       body: JSON.stringify({
         model: "openrouter/auto",
-        messages: [{ role: "user", content: prompt }],
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
         temperature: 0.85,
         max_tokens: 300
       })
@@ -20,7 +44,6 @@ app.post("/explain", async (req, res) => {
 
     const data = await response.json();
 
-    // ✅ Return only the part your frontend expects
     res.json({
       choices: [
         {
@@ -31,9 +54,13 @@ app.post("/explain", async (req, res) => {
       ]
     });
 
-  } catch (err) {
-    console.error("🚨 Backend error:", err);
+  } catch (error) {
+    console.error("🚨 Backend error:", error);
     res.status(500).json({ error: "Something went wrong." });
   }
 });
 
+// Start the server
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
+});
